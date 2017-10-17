@@ -1,29 +1,18 @@
 import os
 
 # Data Path
-data_path = '..' + os.sep + 'data'
-ingr_info = data_path + os.sep + 'scientific_report' + os.sep + 'ingr_info.tsv'
-comp_info = data_path + os.sep + 'scientific_report' + os.sep + 'comp_info.tsv'
-ingr_comp = data_path + os.sep + 'scientific_report' + os.sep +'ingr_comp.tsv'
+path_data = '..' + os.sep + 'data'
+path_ingr_info = path_data + os.sep + 'scientific_report' + os.sep + 'ingr_info.tsv'
+path_comp_info = path_data + os.sep + 'scientific_report' + os.sep + 'comp_info.tsv'
+path_ingr_comp = path_data + os.sep + 'scientific_report' + os.sep +'ingr_comp.tsv'
+path_ingr_sentence = path_data + os.sep + 'scientific_report' + os.sep +'ingredient_with_compounds_sentence_level'
 
 # Result Path
-results_path = ".." + os.sep + "results"
+path_results = ".." + os.sep + "results"
+path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_commpounds_50.bin'
 
+# Pre-Trained Embedding Path
+path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_commpounds_50.bin'
 
-
-# Minibatch Size
-BATCH_SIZE = 32
-# Gradient clip threshold
-GRAD_CLIP = 10
-# Learning rate
-LEARNING_RATE = 0.0005
-# Maximum number of steps in BPTT
-GRAD_STEPS = -1
-# Number of epochs for training
-NUM_EPOCHS = 10
-# do validation every VALIDATION_FREQ iterations
-VALIDATION_FREQ = 100
-# maximum word length for character model
-MAX_WORD_LEN = 10
-
-
+# Ingredient-Compounds Pair / Threshold for Least Compounds
+LEAST_COMPOUNDS = 10

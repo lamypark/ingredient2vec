@@ -10,9 +10,11 @@ path_ingr_sentence = path_data + os.sep + 'scientific_report' + os.sep +'ingredi
 # Result Path
 path_results = ".." + os.sep + "results"
 path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_compounds_50.bin'
+path_embeddings_ingredients = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients_50.bin'
 
 # Pre-Trained Embedding Path
 path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_compounds_50.bin'
+path_embeddings_ingredients = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients_50.bin'
 
 # Ingredient-Compounds Pair / Threshold for Least Compounds
 LEAST_COMPOUNDS = 10

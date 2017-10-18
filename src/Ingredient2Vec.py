@@ -66,7 +66,7 @@ if __name__ == '__main__':
 	model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=True, path_pretrained=Config.path_embeddings_compounds)
 
 	# save character-level compounds embeddings with doc2vec
-	#gensimLoader.save_doc2vec(model=model_comp2vec, path=Config.path_embeddings_compounds)
+	gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
 
 	"""
 	Plot Doc2Vec 
@@ -74,7 +74,9 @@ if __name__ == '__main__':
 	"""
 
 	# plot data
-	DataPlotter.plot_pipeline(model=model_ingr2vec, path=Config.path_results, withLegends=True)
+	#DataPlotter.plot_pipeline(model=model_ingr2vec, path=Config.path_results, withLegends=True)
+
+	loaded_model = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
 
 
 

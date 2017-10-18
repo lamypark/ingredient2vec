@@ -1,5 +1,6 @@
 import time
 import gensim
+from gensim.models.keyedvectors import KeyedVectors
 import multiprocessing
 
 class GensimModels():
@@ -25,7 +26,7 @@ class GensimModels():
 		print "Total Documents Count:", model.corpus_count		
 
 		if load_pretrained:
-			model.intersect_word2vec_format(path_pretrained, lockf=1.0, binary=True, encoding='utf8', unicode_errors='strict')
+			model.intersect_word2vec_format(path_pretrained, lockf=0.0, binary=True, encoding='utf8', unicode_errors='strict')
 
 		print "\nTraining Started..."
 		model.train(corpus, total_examples=model.corpus_count, epochs=model.iter)
@@ -35,5 +36,12 @@ class GensimModels():
 
 		return model
 
+	def load_word2vec(self, path):
+		model = KeyedVectors.load_word2vec_format(path, binary=True)
+		return model
+
 	def save_doc2vec(self, model, path):
+		model.save_word2vec_format(path, doctag_vec=True, word_vec=True, prefix='*dt_', fvocab=None, binary=True)
+
+	def save_doc2vec_only_doc(self, model, path):
 		model.save_word2vec_format(path, doctag_vec=True, word_vec=False, prefix='*dt_', fvocab=None, binary=True)

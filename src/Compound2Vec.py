@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	model_comp2vec = gensimLoader.build_doc2vec(corpus_compound2character)
 
 	# save character-level compounds embeddings with doc2vec
-	gensimLoader.save_doc2vec(model=model_comp2vec, path=Config.path_embeddings_compounds)
+	gensimLoader.save_doc2vec_only_doc(model=model_comp2vec, path=Config.path_embeddings_compounds)
 
 
 	"""

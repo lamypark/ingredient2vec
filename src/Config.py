@@ -1,5 +1,10 @@
 import os
 
+# Ingredient-Compounds Pair / Threshold for Least Compounds
+FILTERING = 5
+SAMPLING = 50
+
+
 # Data Path
 path_data = '..' + os.sep + 'data'
 path_ingr_info = path_data + os.sep + 'scientific_report' + os.sep + 'ingr_info.tsv'
@@ -11,10 +16,9 @@ path_ingr_sentence = path_data + os.sep + 'scientific_report' + os.sep +'ingredi
 path_results = ".." + os.sep + "results"
 path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_compounds_50.bin'
 path_embeddings_ingredients = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients_50.bin'
+path_plottings_ingredients = path_results + os.sep + 'ingredient_embeddings_f' + str(FILTERING) + '_s' + str(SAMPLING)
 
 # Pre-Trained Embedding Path
 path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_compounds_50.bin'
 path_embeddings_ingredients = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients_50.bin'
 
-# Ingredient-Compounds Pair / Threshold for Least Compounds
-LEAST_COMPOUNDS = 10

@@ -3,6 +3,8 @@ import gensim
 from gensim.models.keyedvectors import KeyedVectors
 import multiprocessing
 
+import Config
+
 class GensimModels():
 	
 	"""
@@ -19,7 +21,7 @@ class GensimModels():
 		#model = gensim.models.doc2vec.Doc2Vec(size=50, min_count=5, iter=55)
 
 		# PV-DM w/ average
-		model = gensim.models.doc2vec.Doc2Vec(size=50, window=5, min_count=3, iter=100)
+		model = gensim.models.doc2vec.Doc2Vec(size=50, window=Config.FILTERING, min_count=Config.FILTERING, iter=100)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
 		print "Unique Words Count:", len(model.wv.vocab)

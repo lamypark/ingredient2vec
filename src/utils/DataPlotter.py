@@ -66,7 +66,7 @@ def plot_pipeline(model, path, withLegends=False):
 			'spice',
 		]
 
-		make_plot_with_labels_legends(name=path+'/ingredient2vec_171018',
+		make_plot_with_labels_legends(name=path,
           points=model_tsne, 
           labels=labels, 
           legend_labels=categories, 

@@ -6,9 +6,70 @@ from sklearn.manifold import TSNE
 import time
 import itertools
 import numpy as np
+from sklearn.cluster import KMeans
+
+
+
+
 
 import DataLoader
 import Config
+
+
+def plot_clustering(model, path):
+	#TSNE
+	model_tsne = load_TSNE(model)
+
+	#Label Load
+	labels = []
+	for label in model.vocab:
+		labels.append(label)
+
+	kmeans = KMeans(n_clusters=11, random_state=0).fit(model_tsne)
+	clusters = kmeans.labels_
+	clusters = map(str, clusters)
+
+	clusters_color = list(set(clusters))
+
+	cluster2color = {
+		'0' : sns.xkcd_rgb["purple"],
+		'1' : sns.xkcd_rgb["forest green"],
+		'2' : sns.xkcd_rgb["light pink"],
+		'3' : sns.xkcd_rgb["mustard yellow"],
+		'4' : sns.xkcd_rgb["orange"],
+		'5' : sns.xkcd_rgb["magenta"],
+		'6' : sns.xkcd_rgb["purple"],
+		'7' : sns.xkcd_rgb["blue"],
+		'8' : sns.xkcd_rgb["deep blue"],
+		'9' : sns.xkcd_rgb["sky blue"],
+		'10' : sns.xkcd_rgb["olive"],
+	}
+
+	cluster_order = [
+		'0',
+		'1',
+		'2',
+		'3',
+		'4',
+		'5',
+		'6',
+		'7',
+		'8',
+		'9',
+		'10',
+
+
+	]
+
+	make_plot_with_labels_legends(name=path,
+          points=model_tsne, 
+          labels=labels, 
+          legend_labels=clusters, 
+          legend_order=cluster_order, 
+          legend_label_to_color=cluster2color, 
+          pretty_legend_label=pretty_category,
+          publish=False)
+
 
 
 def plot_pipeline(model, path, withLegends=False):
@@ -16,11 +77,13 @@ def plot_pipeline(model, path, withLegends=False):
 	#TSNE
 	model_tsne = load_TSNE(model)
 
+	#Label Load
 	labels = []
-	for doc_id in range(0, len(model.docvecs)):
-		labels.append(model.docvecs.index_to_doctag(doc_id))
+	for label in model.vocab:
+		labels.append(label)
 
 
+	#Legend Load
 	if withLegends:
 		dl = DataLoader.DataLoader()
 		ingredients = dl.load_ingredients(Config.path_ingr_info)
@@ -81,7 +144,6 @@ def plot_pipeline(model, path, withLegends=False):
 				  labels=labels, 
 				  publish=False)
 
-
 """
 TSNE of Doc2Vec
 
@@ -89,7 +151,10 @@ TSNE of Doc2Vec
 def load_TSNE(model, dim=2):
 	print "\nt-SNE Started... "
 	time_start = time.time()
-	X = model.docvecs
+
+	X = []
+	for x in model.vocab:
+		X.append(model.word_vec(x))
 	tsne = TSNE(n_components=dim)
 	X_tsne = tsne.fit_transform(X)
 

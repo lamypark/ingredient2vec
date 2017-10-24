@@ -11,7 +11,7 @@ class GensimModels():
 	Train Doc2Vec Model
 
 	"""
-	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained=""):
+	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained="" ):
 		print "\nStart to build Doc2Vec Models with Gensim..."
 
 		time_start = time.time()
@@ -46,4 +46,4 @@ class GensimModels():
 		model.save_word2vec_format(path, doctag_vec=True, word_vec=True, prefix='*dt_', fvocab=None, binary=True)
 
 	def save_doc2vec_only_doc(self, model, path):
-		model.save_word2vec_format(path, doctag_vec=True, word_vec=False, prefix='*dt_', fvocab=None, binary=True)
+		model.save_word2vec_format(path, doctag_vec=True, word_vec=False, prefix='', fvocab=None, binary=True)

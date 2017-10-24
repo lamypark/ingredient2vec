@@ -6,11 +6,9 @@ from sklearn.manifold import TSNE
 import time
 import itertools
 import numpy as np
-from sklearn.cluster import KMeans
 
-
-
-
+import hdbscan
+import matplotlib.pyplot as plt
 
 import DataLoader
 import Config
@@ -20,29 +18,49 @@ def plot_clustering(model, path):
 	#TSNE
 	model_tsne = load_TSNE(model)
 
-	#Label Load
+	print "\nHDBSCAN Started..."
+	print model_tsne.shape
+
+	clusterer = hdbscan.HDBSCAN(min_cluster_size=8, min_samples=3, alpha=0.2).fit(model_tsne)
+
+	print "HDBSCAN done..."
+
+	print "\nPlotly Started..."
+
+	num_cluster = len(set(clusterer.labels_))
+	print "num_cluster", num_cluster
+
+	#labels
 	labels = []
 	for label in model.vocab:
 		labels.append(label)
 
-	kmeans = KMeans(n_clusters=11, random_state=0).fit(model_tsne)
-	clusters = kmeans.labels_
-	clusters = map(str, clusters)
-
-	clusters_color = list(set(clusters))
-
+	#legend_labels
+	clusters = map(str, clusterer.labels_)
+	
 	cluster2color = {
-		'0' : sns.xkcd_rgb["purple"],
+		'0' :  sns.xkcd_rgb["purple"],
 		'1' : sns.xkcd_rgb["forest green"],
 		'2' : sns.xkcd_rgb["light pink"],
 		'3' : sns.xkcd_rgb["mustard yellow"],
 		'4' : sns.xkcd_rgb["orange"],
 		'5' : sns.xkcd_rgb["magenta"],
 		'6' : sns.xkcd_rgb["purple"],
-		'7' : sns.xkcd_rgb["blue"],
+		'7' : sns.xkcd_rgb["pink"],
 		'8' : sns.xkcd_rgb["deep blue"],
 		'9' : sns.xkcd_rgb["sky blue"],
 		'10' : sns.xkcd_rgb["olive"],
+		'11' : sns.xkcd_rgb["red"],
+		'12' : sns.xkcd_rgb["yellow"],
+		'13' : sns.xkcd_rgb["lime"],
+		'14' : sns.xkcd_rgb["salmon"],
+		'15' : sns.xkcd_rgb["navy"],
+		'16' : sns.xkcd_rgb["beige"],
+		'17' : sns.xkcd_rgb["mint"],
+		'18' : sns.xkcd_rgb["crimson"],
+		'19' : sns.xkcd_rgb["azure"],
+		'20' : sns.xkcd_rgb["lemon"],
+		'-1' : sns.xkcd_rgb["grey"],
 	}
 
 	cluster_order = [
@@ -57,18 +75,31 @@ def plot_clustering(model, path):
 		'8',
 		'9',
 		'10',
-
-
+		'11',
+		'12',
+		'13',
+		'14',
+		'15',
+		'16',
+		'17',
+		'18',
+		'19',
+		'20',
+		'-1',
 	]
 
 	make_plot_with_labels_legends(name=path,
-          points=model_tsne, 
-          labels=labels, 
-          legend_labels=clusters, 
-          legend_order=cluster_order, 
-          legend_label_to_color=cluster2color, 
-          pretty_legend_label=pretty_category,
-          publish=False)
+		  points=model_tsne, 
+		  labels=labels, 
+		  legend_labels=clusters, 
+		  legend_order=cluster_order, 
+		  legend_label_to_color=cluster2color, 
+		  pretty_legend_label=pretty_category,
+		  publish=False)
+	
+	print "Plotly Done..."
+
+	
 
 
 
@@ -82,7 +113,6 @@ def plot_pipeline(model, path, withLegends=False):
 	for label in model.vocab:
 		labels.append(label)
 
-
 	#Legend Load
 	if withLegends:
 		dl = DataLoader.DataLoader()
@@ -93,7 +123,6 @@ def plot_pipeline(model, path, withLegends=False):
 			categories.append(dl.ingredient_to_category(label,ingredients))
 		
 		categories_color = list(set(categories))
-
 
 		category2color = {
 			'plant' :  sns.xkcd_rgb["purple"],
@@ -130,13 +159,13 @@ def plot_pipeline(model, path, withLegends=False):
 		]
 
 		make_plot_with_labels_legends(name=path,
-          points=model_tsne, 
-          labels=labels, 
-          legend_labels=categories, 
-          legend_order=category_order, 
-          legend_label_to_color=category2color, 
-          pretty_legend_label=pretty_category,
-          publish=False)
+		  points=model_tsne, 
+		  labels=labels, 
+		  legend_labels=categories, 
+		  legend_order=category_order, 
+		  legend_label_to_color=category2color, 
+		  pretty_legend_label=pretty_category,
+		  publish=False)
 
 	else:
 		make_plot_only_labels(name=path+'/compound2vec_171018',

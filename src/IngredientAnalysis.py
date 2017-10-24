@@ -51,7 +51,7 @@ if __name__ == '__main__':
 	"""
 
 	# plot data with category
-	#DataPlotter.plot_pipeline(model=model_ingr2vec, path=Config.path_plottings_ingredients, withLegends=True)
+	#DataPlotter.plot_pipeline(model=model, path=Config.path_plottings_ingredients, withLegends=True)
 
 	# plot data with clustering
 	DataPlotter.plot_clustering(model=model, path=Config.path_plottings_ingredients_clustering)

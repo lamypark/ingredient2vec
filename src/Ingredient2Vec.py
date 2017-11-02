@@ -94,9 +94,6 @@ if __name__ == '__main__':
 
 	model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
 
-	# plot data with category
-	DataPlotter.plot_pipeline(model=model_loaded, path=Config.path_plottings_ingredients_category, withLegends=True)
-
 
 	
 

@@ -50,10 +50,14 @@ if __name__ == '__main__':
 
 	"""
 
+	# TSNE
+	model_TSNE = DataPlotter.load_TSNE(model)
+
+
 	# plot data with category
-	#DataPlotter.plot_pipeline(model=model, path=Config.path_plottings_ingredients, withLegends=True)
+	DataPlotter.plot_category(model=model, model_tsne=model_TSNE, path=Config.path_plottings_ingredients_category, withLegends=True)
 
 	# plot data with clustering
-	DataPlotter.plot_clustering(model=model, path=Config.path_plottings_ingredients_clustering)
+	DataPlotter.plot_clustering(model=model, model_tsne=model_TSNE, path=Config.path_plottings_ingredients_clustering)
 
 	

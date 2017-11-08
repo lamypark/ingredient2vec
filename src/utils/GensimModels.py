@@ -12,7 +12,7 @@ class GensimModels():
 
 	"""
 	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained=""):
-		print "\nStart to build Doc2Vec Models with Gensim..."
+		print "\n\n...Start to build Doc2Vec Models with Gensim"
 
 		time_start = time.time()
 		cores = multiprocessing.cpu_count()
@@ -28,7 +28,7 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
-		model = gensim.models.doc2vec.Doc2Vec(size=50, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, sg=0, hs=0, negative=5, cbow_mean=1, iter=100)
+		model = gensim.models.doc2vec.Doc2Vec(size=50, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, iter=100)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
 		print "Unique Words Count:", len(model.wv.vocab)
@@ -37,7 +37,7 @@ class GensimModels():
 		if load_pretrained:
 			model.intersect_word2vec_format(path_pretrained, lockf=0.0, binary=True, encoding='utf8', unicode_errors='strict')
 
-		print "\nTraining Started..."
+		print "\n\n...Training Started"
 		model.train(corpus, total_examples=model.corpus_count, epochs=model.iter)
 
 		print "Doc2Vec training done!"

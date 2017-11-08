@@ -9,9 +9,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 
-
-
-
 import DataLoader
 import Config
 
@@ -132,7 +129,7 @@ def plot_category(model, model_tsne, path, withLegends=False):
           publish=False)
 
 	else:
-		make_plot_only_labels(name=path+'/compound2vec_171018',
+		make_plot_only_labels(name=path,
 				  points=model_tsne, 
 				  labels=labels, 
 				  publish=False)
@@ -155,6 +152,7 @@ def load_TSNE(model, dim=2):
 	print "Time elapsed: {} seconds".format(time.time()-time_start)
 
 	return X_tsne
+	
 
 """
 Load functions for plotting a graph

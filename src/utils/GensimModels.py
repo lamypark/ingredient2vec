@@ -11,7 +11,7 @@ class GensimModels():
 	Train Doc2Vec Model
 
 	"""
-	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained="" ):
+	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained=""):
 		print "\nStart to build Doc2Vec Models with Gensim..."
 
 		time_start = time.time()
@@ -21,7 +21,14 @@ class GensimModels():
 		#model = gensim.models.doc2vec.Doc2Vec(size=50, min_count=5, iter=55)
 
 		# PV-DM w/ average
-		model = gensim.models.doc2vec.Doc2Vec(size=50, window=Config.FILTERING, min_count=Config.FILTERING, iter=100)
+		"""
+		class gensim.models.word2vec.Word2Vec
+		(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, 
+		sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1, 
+		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
+		batch_words=10000, compute_loss=False)
+		"""
+		model = gensim.models.doc2vec.Doc2Vec(size=50, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, sg=0, hs=0, negative=5, cbow_mean=1, iter=100)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
 		print "Unique Words Count:", len(model.wv.vocab)

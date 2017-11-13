@@ -16,7 +16,8 @@ path_data = '..' + os.sep + 'data'
 path_ingr_info = path_data + os.sep + 'scientific_report' + os.sep + 'ingr_info.tsv'
 path_comp_info = path_data + os.sep + 'scientific_report' + os.sep + 'comp_info.tsv'
 path_ingr_comp = path_data + os.sep + 'scientific_report' + os.sep +'ingr_comp.tsv'
-path_ingr_sentence = path_data + os.sep + 'scientific_report' + os.sep +'ingredient_with_compounds_sentence_level'
+
+path_cuisine = path_data + os.sep + 'kaggle_and_nature.csv'
 
 # Result Path
 path_results = ".." + os.sep + "results"

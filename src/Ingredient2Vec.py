@@ -71,7 +71,7 @@ if __name__ == '__main__':
 	ingredients = dataLoader.load_ingredients(Config.path_ingr_info)
 	compounds = dataLoader.load_compounds(Config.path_comp_info)
 	relations = dataLoader.load_relations(Config.path_ingr_comp)
-
+ 
 
 	"""
 	Preproccesing

@@ -86,8 +86,28 @@ class DataLoader:
 		return corpus[index].tags
 
 
+	# Cuisine - Ingredients
+	def load_cuisine(self, path):
+		cuisines = {}
+		ingredient_list = []
+		with open(path, 'r') as f:
+			for line in f:
+				if line[0] == '#':
+					pass
+				else:
+					line_split = line.rstrip().split(',')
+					cuisine = line_split[0]
+					ingredient_list = line_split[1:]
+					cuisines[cuisine] = ingredient_list
+
+		return cuisines
+
+
+
 if __name__ == '__main__':
 	dl = DataLoader()
-	ingredients = dl.load_ingredients(Config.path_ingr_info)
-	compounds = dl.load_compounds(Config.path_comp_info)
-	relations = dl.load_relations(Config.path_ingr_comp)
+	#ingredients = dl.load_ingredients(Config.path_ingr_info)
+	#compounds = dl.load_compounds(Config.path_comp_info)
+	#relations = dl.load_relations(Config.path_ingr_comp)
+
+	cuisines = dl.load_cuisine(Config.path_cuisine)

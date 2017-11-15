@@ -1,6 +1,6 @@
 import os
 import collections
-import smart_open 
+import smart_open
 
 import Config
 
@@ -90,17 +90,22 @@ class DataLoader:
 	def load_cuisine(self, path):
 		cuisines = {}
 		ingredient_list = []
+		vocab = []
+
 		with open(path, 'r') as f:
-			for line in f:
+			cuisine_id = 0
+			for cuisine_id, line in enumerate(f):
 				if line[0] == '#':
 					pass
 				else:
 					line_split = line.rstrip().split(',')
-					cuisine = line_split[0]
+					cuisine_label = line_split[0]
 					ingredient_list = line_split[1:]
-					cuisines[cuisine] = ingredient_list
+					cuisines[cuisine_id] = [ingredient_list, [cuisine_label]]
+					for ingr in ingredient_list:
+						vocab.append(ingr)
 
-		return cuisines
+		return cuisines, set(vocab)
 
 
 

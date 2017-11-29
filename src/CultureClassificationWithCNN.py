@@ -193,12 +193,12 @@ for i in xrange(num_epochs):
     if (i+1) % evaluate_every == 0:
         print("==================================================================================")
         print("Evaluation at epoch #{:d}: ".format(i+1))
-        test_batches = data_loader.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
+        test_batches = dl.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
         print_score(test_batches, step=2)
 
 # Testing
 print("Training End..")
 print("==================================================================================")
 print("Test: ")
-test_batches = data_loader.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
+test_batches = dl.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
 print_score(test_batches, step=3)

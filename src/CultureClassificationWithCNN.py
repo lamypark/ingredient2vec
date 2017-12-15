@@ -20,7 +20,7 @@ ltype = torch.cuda.LongTensor
 train_file = Config.path_culture
 
 # Model Hyperparameters
-feat_dim = 50
+feat_dim = 10
 cnn_w = [1,2,3,5]
 cnn_h = [25,50,75,125]
 sum_h = sum(cnn_h)
@@ -37,24 +37,25 @@ evaluate_every = 3
 # Load data
 print("Loading data...")
 dl = DataLoader.DataLoader()
-id2cult, id2comp, train_cult, train_comp, train_comp_len, test_cult, test_comp, test_comp_len, max_comp_cnt = dl.load_data(train_file)
+id2cult, id2ingr, train_cult, train_ingr, train_ingr_len, test_cult, test_ingr, test_ingr_len, max_ingr_cnt, ingrid2vec = dl.load_data(train_file, feat_dim)
 
-print("Train/Test/Cult/Comp: {:d}/{:d}/{:d}/{:d}".format(len(train_cult), len(test_cult), len(id2cult), len(id2comp)))
+print("Train/Test/Cult/ingr: {:d}/{:d}/{:d}/{:d}".format(len(train_cult), len(test_cult), len(id2cult), len(id2ingr)))
 print("==================================================================================")
 
 class ConvModule(nn.Module):
-    def __init__(self, input_size, kernel_sizes, comp_cnt):
+    def __init__(self, input_size, kernel_sizes, ingr_cnt):
         super(ConvModule, self).__init__()
 
         # attributes:
-        self.maxlen = max_comp_cnt
+        self.maxlen = max_ingr_cnt
         self.in_channels = input_size
         self.out_channels = len(id2cult) #[25*k for k in kernel_sizes]
         self.cnn_kernel_size = 3 #kernel_sizes
         self.mp_kernel_size = self.maxlen - self.cnn_kernel_size + 1
 
         # modules:
-        self.comp_weight = nn.Embedding(comp_cnt, feat_dim).type(ftype)
+        self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim).type(ftype)
+        #self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
         self.cnn1 = nn.Conv1d(self.in_channels, 32, self.cnn_kernel_size)
         self.cnn2 = nn.Conv1d(32, self.out_channels, self.cnn_kernel_size)
         '''
@@ -66,11 +67,11 @@ class ConvModule(nn.Module):
         self.maxpool2 = nn.MaxPool1d(18)
         self.relu = nn.ReLU()
 
-    def forward(self, composer, emb_mask):
-        composer = self.comp_weight(composer)
-        composer = torch.mul(composer, emb_mask).permute(0,2,1)
+    def forward(self, ingredient, emb_mask):
+        ingredient = self.ingr_weight(ingredient)
+        ingredient = torch.mul(ingredient, emb_mask).permute(0,2,1)
 
-        output = self.cnn1(composer)
+        output = self.cnn1(ingredient)
         output = torch.squeeze(self.maxpool1(output))
         output = self.relu(output)
 
@@ -80,7 +81,7 @@ class ConvModule(nn.Module):
         '''
         output = []
         for i, conv in enumerate(self.cnn):
-            output.append(torch.max(F.tanh(conv(composer)), dim=2)[0])
+            output.append(torch.max(F.tanh(conv(ingredient)), dim=2)[0])
         output = torch.cat(output, 1)
         '''
 
@@ -125,17 +126,17 @@ def make_mask(maxlen, dim, length):
     # [[1 1 1 ... 1 0 0 0 ... 0]...]
     return Variable(torch.from_numpy(np.asarray(mask)).type(ftype), requires_grad=False)
 
-def run(culture, composer, composer_cnt, step):
+def run(culture, ingredient, ingredient_cnt, step):
 
     optimizer.zero_grad()
 
     # (batch)
     culture = Variable(torch.from_numpy(np.asarray(culture))).type(ltype)
-    # (batch) x (max_comp_cnt(65))
-    composer = Variable(torch.from_numpy(np.asarray(composer))).type(ltype)
-    emb_mask = make_mask(max_comp_cnt, feat_dim, composer_cnt).view(-1, max_comp_cnt, feat_dim)
+    # (batch) x (max_ingr_cnt(65))
+    ingredient = Variable(torch.from_numpy(np.asarray(ingredient))).type(ltype)
+    emb_mask = make_mask(max_ingr_cnt, feat_dim, ingredient_cnt).view(-1, max_ingr_cnt, feat_dim)
     # (batch) x (sum(25 * cnn_w)(275))
-    cnn_output = cnn_model(composer, emb_mask)
+    cnn_output = cnn_model(ingredient, emb_mask)
     # (batch) x (culture_cnt)
     #lin_output = linear_model(cnn_output)
 
@@ -158,19 +159,19 @@ def print_score(batches, step):
     total_loss = 0.0
 
     for i, batch in enumerate(batches):
-        batch_cult, batch_comp, batch_comp_len = zip(*batch)
-        batch_hc, batch_loss = run(batch_cult, batch_comp, batch_comp_len, step=step)
+        batch_cult, batch_ingr, batch_ingr_len = zip(*batch)
+        batch_hc, batch_loss = run(batch_cult, batch_ingr, batch_ingr_len, step=step)
         total_hc += batch_hc
         total_loss += batch_loss
 
     print("loss: ", total_loss/i)
     print("acc.: ", total_hc/len(test_cult)*100)
     if step == 3:
-        np.save("composer_weight.npy", cnn_model.comp_weight.weight.data.cpu().numpy())
-        np.save("id2comp.npy", id2comp)
+        np.save("ingredient_weight.npy", cnn_model.ingr_weight.weight.data.cpu().numpy())
+        np.save("id2ingr.npy", id2ingr)
 
 ###############################################################################################
-cnn_model = ConvModule(feat_dim, cnn_w, len(id2comp)).cuda()
+cnn_model = ConvModule(feat_dim, cnn_w, len(id2ingr)).cuda()
 linear_model = LinearModule(sum_h, len(id2cult)).cuda()
 loss_model = nn.CrossEntropyLoss().cuda()
 #optimizer = torch.optim.SGD(parameters(), lr=learning_rate, momentum=momentum)
@@ -178,12 +179,12 @@ optimizer = torch.optim.Adam(parameters(), lr=learning_rate, betas=momentum)
 
 for i in xrange(num_epochs):
     # Training
-    train_batches = dl.batch_iter(list(zip(train_cult, train_comp, train_comp_len)), batch_size)
+    train_batches = dl.batch_iter(list(zip(train_cult, train_ingr, train_ingr_len)), batch_size)
     total_hc = 0.
     total_loss = 0.
     for j, train_batch in enumerate(train_batches):
-        batch_cult, batch_comp, batch_comp_len = zip(*train_batch)
-        batch_hc, batch_loss = run(batch_cult, batch_comp, batch_comp_len, step=1)
+        batch_cult, batch_ingr, batch_ingr_len = zip(*train_batch)
+        batch_hc, batch_loss = run(batch_cult, batch_ingr, batch_ingr_len, step=1)
         total_hc += batch_hc
         total_loss += batch_loss
         if (j+1) % 500 == 0:
@@ -193,12 +194,12 @@ for i in xrange(num_epochs):
     if (i+1) % evaluate_every == 0:
         print("==================================================================================")
         print("Evaluation at epoch #{:d}: ".format(i+1))
-        test_batches = dl.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
+        test_batches = dl.batch_iter(list(zip(test_cult, test_ingr, test_ingr_len)), batch_size)
         print_score(test_batches, step=2)
 
 # Testing
 print("Training End..")
 print("==================================================================================")
 print("Test: ")
-test_batches = dl.batch_iter(list(zip(test_cult, test_comp, test_comp_len)), batch_size)
+test_batches = dl.batch_iter(list(zip(test_cult, test_ingr, test_ingr_len)), batch_size)
 print_score(test_batches, step=3)

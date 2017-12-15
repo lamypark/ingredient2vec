@@ -71,7 +71,6 @@ if __name__ == '__main__':
 	ingredients = dataLoader.load_ingredients(Config.path_ingr_info)
 	compounds = dataLoader.load_compounds(Config.path_comp_info)
 	relations = dataLoader.load_relations(Config.path_ingr_comp)
- 
 
 	"""
 	Preproccesing
@@ -87,18 +86,23 @@ if __name__ == '__main__':
 	"""
 
 	# build ingredient embeddings with doc2vec
-	#model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.PRE_TRAIN, path_pretrained=Config.path_embeddings_compounds)
+	model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds)
 
 	# save character-level compounds embeddings with doc2vec
-	#gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
+	gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
 	model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
+
+
+	X = []
+	for x in model_loaded.vocab:
+		print x, model_loaded.word_vec(x)
 
 	"""
 	Plot Ingredient2Vec
 
 	"""
 	model_tsne = DataPlotter.load_TSNE(model_loaded, dim=2)
-	#DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category, withLegends=True)
-	DataPlotter.plot_clustering(model_loaded, model_tsne, Config.path_plottings_ingredients_clustering)
+	DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category, withLegends=True)
+	#DataPlotter.plot_clustering(model_loaded, model_tsne, Config.path_plottings_ingredients_clustering)
 
 

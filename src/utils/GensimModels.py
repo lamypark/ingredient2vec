@@ -28,11 +28,16 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
-		model = gensim.models.doc2vec.Doc2Vec(size=50, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, iter=100)
+		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=4, iter=100, 
+												dbow_words=1, dm_mean=0)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
+		print "Document Embedding Dimension:", Config.DOC_DIM
+		print "Document Window & Filtering:", Config.FILTERING
+
+
 		print "Unique Words Count:", len(model.wv.vocab)
-		print "Total Documents Count:", model.corpus_count		
+		print "Total Documents Count:", model.corpus_count
 
 		if load_pretrained:
 			model.intersect_word2vec_format(path_pretrained, lockf=0.0, binary=True, encoding='utf8', unicode_errors='strict')

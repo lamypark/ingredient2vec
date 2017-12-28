@@ -2,6 +2,7 @@
 
 import os
 import datetime
+import random
 import numpy as np
 import torch
 import torch.nn as nn
@@ -51,25 +52,27 @@ class LinearModule(nn.Module):
 
         # modules:
         self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim).type(ftype)
-        #self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
+        self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
         self.linear1 = nn.Linear(self.input_size, self.hidden_size1)
         self.linear2 = nn.Linear(self.hidden_size1, self.hidden_size2)
         self.linear3 = nn.Linear(self.hidden_size2, self.output_size)
-        self.dropout1 = nn.Dropout(p=0.25)
-        self.dropout2 = nn.Dropout(p=0.25)
+        self.dropout1 = nn.Dropout(p=0.2)
+        self.dropout2 = nn.Dropout(p=0.2)
         self.active = nn.Sigmoid()
 
-    def forward(self, x, emb_mask, step):
+    def forward(self, x, emb_mask, x_cnt, step):
+        b_s = x.shape[0]
+        idx = []
+        for i in xrange(b_s):
+            idx.append(random.sample([j for j in xrange(max_ingr_cnt)], max_ingr_cnt))
+        idx = [a+i*max_ingr_cnt for i, b in enumerate(idx) for a in b]
         x = self.ingr_weight(x)
-        x = torch.mul(x, emb_mask)
-        x = x.view(-1, feat_dim * max_ingr_cnt) # feat_dim x 65
+        x = torch.mul(x, emb_mask).view(-1, feat_dim)
+        x = x[idx].view(-1, self.input_size) # feat_dim x 65
+
         x = self.active(self.linear1(x))
-        if step == 1:
-            x = self.dropout1(x)
         x = self.active(self.linear2(x))
-        if step == 1:
-            x = self.dropout2(x)
-        x = self.active(self.linear3(x))
+        x = self.linear3(x)
 
         return x
 
@@ -100,8 +103,7 @@ def run(culture, ingredient, ingredient_cnt, step):
     # (batch) x (max_ingr_cnt(65))
     ingredient = Variable(torch.from_numpy(np.asarray(ingredient))).type(ltype)
     emb_mask = make_mask(max_ingr_cnt, feat_dim, ingredient_cnt).view(-1, max_ingr_cnt, feat_dim)
-    #cnn_output = cnn_model(ingredient, emb_mask)
-    lin_output = linear_model(ingredient, emb_mask, step)
+    lin_output = linear_model(ingredient, emb_mask, ingredient_cnt, step)
 
     J = loss_model(lin_output, culture) 
 

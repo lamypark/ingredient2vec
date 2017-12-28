@@ -3,6 +3,7 @@
 import os
 import datetime
 import numpy as np
+import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -39,43 +40,43 @@ id2cult, id2ingr, train_cult, train_ingr, train_ingr_len, test_cult, test_ingr, 
 print("Train/Test/Cult/ingr: {:d}/{:d}/{:d}/{:d}".format(len(train_cult), len(test_cult), len(id2cult), len(id2ingr)))
 print("==================================================================================")
 
-class LinearModule(nn.Module):
-    def __init__(self, input_size, output_size, ingr_cnt):
-        super(LinearModule, self).__init__()
+class CBOWModule(nn.Module):
+    def __init__(self, input_size, ingr_cnt):
+        super(CBOWModule, self).__init__()
 
         # attributes:
         self.input_size = input_size
-        self.hidden_size1 = 64
-        self.hidden_size2 = 32
-        self.output_size = output_size
+        self.hidden_size1 = 256
 
         # modules:
         self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim).type(ftype)
-        #self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
+        self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
         self.linear1 = nn.Linear(self.input_size, self.hidden_size1)
-        self.linear2 = nn.Linear(self.hidden_size1, self.hidden_size2)
-        self.linear3 = nn.Linear(self.hidden_size2, self.output_size)
+        self.linear2 = nn.Linear(self.hidden_size1, len(id2ingr))
         self.dropout1 = nn.Dropout(p=0.25)
         self.dropout2 = nn.Dropout(p=0.25)
-        self.active = nn.Sigmoid()
 
-    def forward(self, x, emb_mask, step):
+    def forward(self, x, emb_mask, x_cnt, step):
+        b_s = x.shape[0]
+        idx = []
+        for i in xrange(b_s):
+            idx.append(random.sample([j for j in xrange(x_cnt[i])], x_cnt[i])\
+                        +[j for j in xrange(x_cnt[i], max_ingr_cnt)])
+        target = np.asarray([x[i][l[0]].data.cpu().numpy() for i, l in enumerate(idx)])
+        target = Variable(torch.from_numpy(np.asarray(target)).view(-1)).type(ltype)
+        idx = [a+i*max_ingr_cnt for i, b in enumerate(idx) for a in b[1:]]
         x = self.ingr_weight(x)
-        x = torch.mul(x, emb_mask)
-        x = x.view(-1, feat_dim * max_ingr_cnt) # feat_dim x 65
-        x = self.active(self.linear1(x))
-        if step == 1:
-            x = self.dropout1(x)
-        x = self.active(self.linear2(x))
-        if step == 1:
-            x = self.dropout2(x)
-        x = self.active(self.linear3(x))
-
-        return x
+        x = torch.mul(x, emb_mask).view(-1, feat_dim)
+        x = x[idx].view(-1, max_ingr_cnt-1, feat_dim)
+        x = torch.sum(x, 1)
+        x = torch.cat([(x[i]/(x_cnt[i]-1)).view(1,feat_dim) for i in xrange(b_s)], 0)
+        out = F.relu(self.linear1(x))
+        out = self.linear2(out)
+        return out, target
 
 def parameters():
     params = []
-    for model in [linear_model]:
+    for model in [cbow_model]:
         params += list(model.parameters())
 
     return params
@@ -91,77 +92,84 @@ def make_mask(maxlen, dim, length):
     # [[1 1 1 ... 1 0 0 0 ... 0]...]
     return Variable(torch.from_numpy(np.asarray(mask)).type(ftype), requires_grad=False)
 
-def run(culture, ingredient, ingredient_cnt, step):
+def run(ingredient, ingredient_cnt, step):
 
     optimizer.zero_grad()
 
-    # (batch)
-    culture = Variable(torch.from_numpy(np.asarray(culture))).type(ltype)
     # (batch) x (max_ingr_cnt(65))
     ingredient = Variable(torch.from_numpy(np.asarray(ingredient))).type(ltype)
     emb_mask = make_mask(max_ingr_cnt, feat_dim, ingredient_cnt).view(-1, max_ingr_cnt, feat_dim)
-    #cnn_output = cnn_model(ingredient, emb_mask)
-    lin_output = linear_model(ingredient, emb_mask, step)
+    cbow_output, target = cbow_model(ingredient, emb_mask, ingredient_cnt, step)
 
-    J = loss_model(lin_output, culture) 
+    J = loss_model(cbow_output, target) 
 
-    lin_output = np.argmax(lin_output.data.cpu().numpy(), axis=1)
-    culture = culture.data.cpu().numpy()
-    hit_cnt = np.sum(np.array(lin_output) == np.array(culture))
-
-    if step == 2:
-        return hit_cnt, J.data.cpu().numpy()
+    if step > 1:
+        cbow_output = np.argsort(-1*cbow_output.data.cpu().numpy(), axis=1)
+        target = target.data.cpu().numpy()
+        return cbow_output, target 
     
     J.backward()
     optimizer.step()
     
-    return hit_cnt, J.data.cpu().numpy()
+    return J.data.cpu().numpy()
 
 def print_score(batches, step):
-    total_hc = 0.0
-    total_loss = 0.0
+    recall1 = 0.
+    recall5 = 0.
+    recall10 = 0.
+    recall100 = 0.
+    recall1000 = 0.
 
-    for i, batch in enumerate(batches):
-        batch_cult, batch_ingr, batch_ingr_len = zip(*batch)
-        batch_hc, batch_loss = run(batch_cult, batch_ingr, batch_ingr_len, step=step)
-        total_hc += batch_hc
-        total_loss += batch_loss
+    for batch in batches:
+        batch_ingr, batch_ingr_len = zip(*batch)
+        batch_o, target = run(batch_ingr, batch_ingr_len, step=step)
 
-    print("loss: ", total_loss/i)
-    print("acc.: ", total_hc/len(test_cult)*100)
+        recall1 += np.sum([target[i] in batch_o[i][:1] for i in xrange(len(target))]) 
+        recall5 += np.sum([target[i] in batch_o[i][:5] for i in xrange(len(target))]) 
+        recall10 += np.sum([target[i] in batch_o[i][:10] for i in xrange(len(target))]) 
+        recall100 += np.sum([target[i] in batch_o[i][:100] for i in xrange(len(target))]) 
+        recall1000 += np.sum([target[i] in batch_o[i][:1000] for i in xrange(len(target))]) 
+
+    test_len = len(test_cult)
+    print("recall@1: ", recall1/test_len)
+    print("recall@5: ", recall5/test_len)
+    print("recall@10: ", recall10/test_len)
+    print("recall@100: ", recall100/test_len)
+    print("recall@1000: ", recall1000/test_len)
+
+    '''
     if step == 3:
         np.save("ingredient_weight.npy", linear_model.ingr_weight.weight.data.cpu().numpy())
         np.save("id2ingr.npy", id2ingr)
+    '''
 
 ###############################################################################################
-linear_model = LinearModule(feat_dim * max_ingr_cnt, len(id2cult), len(id2ingr)).cuda()
+cbow_model = CBOWModule(feat_dim, len(id2ingr)).cuda()
 loss_model = nn.CrossEntropyLoss().cuda()
 optimizer = torch.optim.Adam(parameters(), lr=learning_rate, betas=momentum)
 #optimizer = torch.optim.SGD(parameters(), lr=learning_rate, momentum=momentum)
 
 for i in xrange(num_epochs):
     # Training
-    train_batches = dl.batch_iter(list(zip(train_cult, train_ingr, train_ingr_len)), batch_size)
-    total_hc = 0.
+    train_batches = dl.batch_iter(list(zip(train_ingr, train_ingr_len)), batch_size)
     total_loss = 0.
     for j, train_batch in enumerate(train_batches):
-        batch_cult, batch_ingr, batch_ingr_len = zip(*train_batch)
-        batch_hc, batch_loss = run(batch_cult, batch_ingr, batch_ingr_len, step=1)
-        total_hc += batch_hc
+        batch_ingr, batch_ingr_len = zip(*train_batch)
+        batch_loss = run(batch_ingr, batch_ingr_len, step=1)
         total_loss += batch_loss
         if (j+1) % 1000 == 0:
-            print("batch #{:d}: ".format(j+1)), "batch_loss :", total_loss/j, "acc. :", total_hc/batch_size/j*100, datetime.datetime.now()
+            print("batch #{:d}: ".format(j+1)), "batch_loss :", total_loss/j, datetime.datetime.now()
 
     # Evaluation
     if (i+1) % evaluate_every == 0:
         print("==================================================================================")
         print("Evaluation at epoch #{:d}: ".format(i+1))
-        test_batches = dl.batch_iter(list(zip(test_cult, test_ingr, test_ingr_len)), batch_size)
+        test_batches = dl.batch_iter(list(zip(test_ingr, test_ingr_len)), batch_size)
         print_score(test_batches, step=2)
 
 # Testing
 print("Training End..")
 print("==================================================================================")
 print("Test: ")
-test_batches = dl.batch_iter(list(zip(test_cult, test_ingr, test_ingr_len)), batch_size)
+test_batches = dl.batch_iter(list(zip(test_ingr, test_ingr_len)), batch_size)
 print_score(test_batches, step=3)

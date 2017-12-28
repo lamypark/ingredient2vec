@@ -72,6 +72,7 @@ class DataLoader:
 			yield data[start_index:end_index]
 
     def load_data(self, train, feat_dim):
+        from nltk.stem import WordNetLemmatizer
         import GensimModels
         gensimLoader = GensimModels.GensimModels()
         model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
@@ -129,22 +130,28 @@ class DataLoader:
         w = model_loaded.index2word
         #print [model_loaded[idx] for idx in w]
         wv_var = np.var([model_loaded[idx] for idx in w])
-        print wv_var
 
         '''
         compid2vec = np.array([np.random.rand(feat_dim) if comp not in wv 
                                                         else model_loaded[comp] for comp in id2comp])
         '''
         
+        wnl = WordNetLemmatizer()
         mu, sigma = 0, 1
         compid2vec = []
         unk_cnt = 0
         for comp in id2comp:
-            if comp not in wv:
+            if comp in wv:
+                compid2vec.append(model_loaded[comp])
+            elif wnl.lemmatize(comp) in wv:
+                compid2vec.append(model_loaded[wnl.lemmatize(comp)])
+            elif comp.rstrip().split('_')[-1] in wv:
+                compid2vec.append(model_loaded[comp.rstrip().split('_')[-1]])
+            elif wnl.lemmatize(comp.rstrip().split('_')[-1]) in wv:
+                compid2vec.append(model_loaded[wnl.lemmatize(comp.rstrip().split('_')[-1])])
+            else:
                 compid2vec.append(np.random.normal(mu, sigma, feat_dim))
                 unk_cnt += 1
-            else:
-                compid2vec.append(model_loaded[comp])
 
         print "unk cnt :", unk_cnt, "in", len(id2comp)
         print "filtered composer count is", filtred_comp

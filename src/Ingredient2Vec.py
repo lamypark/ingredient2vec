@@ -87,10 +87,10 @@ if __name__ == '__main__':
 	"""
 
 	# build ingredient embeddings with doc2vec
-	#model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.PRE_TRAIN, path_pretrained=Config.path_embeddings_compounds)
+	model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.PRE_TRAIN, path_pretrained=Config.path_embeddings_compounds)
 
 	# save character-level compounds embeddings with doc2vec
-	#gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
+	gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
 	model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
 
 	"""

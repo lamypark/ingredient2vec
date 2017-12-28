@@ -28,7 +28,7 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
-		model = gensim.models.doc2vec.Doc2Vec(size=50, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, iter=100)
+		model = gensim.models.doc2vec.Doc2Vec(size=10, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, iter=100)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
 		print "Unique Words Count:", len(model.wv.vocab)

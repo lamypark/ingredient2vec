@@ -55,7 +55,7 @@ class ConvModule(nn.Module):
 
         # modules:
         self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim).type(ftype)
-        #self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
+        self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
         self.cnn1 = nn.Conv1d(self.in_channels, 32, self.cnn_kernel_size)
         self.cnn2 = nn.Conv1d(32, self.out_channels, self.cnn_kernel_size)
         '''

@@ -4,8 +4,6 @@ bitter_orange_oil	bitter_orange_flower_oil
 melilotus_officinalis	melilotus_officinalis_flower
 orange	orange_flower
 orange_oil	orange_flower_oil
-coffee	coffee_flower
-lemon	lemon_flower
 almond	almond_flower
 tobacco	tobacco_flower
 daffodil	daffodil_flower
@@ -76,6 +74,7 @@ tangerine_oil	tangerine_peel_oil
 mandarin_oil	mandarin_peel_oil
 citronella	citronella_grass
 ginger	ginger_grass
+###
 : cooked-ingredients	"smoked","boiled","grilled","dried","raw"
 herring	smoked_herring
 fatty_fish	smoked_fatty_fish
@@ -115,6 +114,7 @@ turkey	raw_turkey
 cabbage	raw_cabbage
 fatty_fish	raw_fatty_fish
 pork	uncured_pork
+###
 : groupof	"""butter"",""lemon"",""tea"",""bean"",""oat"",""orange"",""fish"",""vanilla"",""potato"",""pepper"",""pork"",""beef"",""chicken"",""cheese"",""grape"",""nut"",""milk"",""sauce"",""lime"",""olive"",""wine"",""whiskey"",""brandy"",""beer"",""rum"",""rice"",""cherry"""
 peanut	peanut_butter
 balm	lemon_balm
@@ -155,6 +155,7 @@ apple	apple_brandy
 raspberry	raspberry_brandy
 brandy	rum_brandy
 brandy	cherry_brandy
+###
 : extracted-ingredients	"oil","juice"
 mastic_gum	mastic_gum_oil
 seed	seed_oil
@@ -346,6 +347,7 @@ citrus	citrus_juice
 black_currant	black_currant_juice
 bitter_orange	bitter_orange_juice
 apple	apple_juice
+###
 : local-ingredients	"japanese_,"chinese_,"california_,"thai_,"spanish_,"asian_,"ethiopian_,"american_,"european_"
 star_anise_oil	japanese_star_anise_oil
 peppermint_oil	japanese_peppermint_oil
@@ -381,3 +383,4 @@ peppermint_oil	american_peppermint_oil
 potato_chip	american_potato_chip
 cranberry	american_cranberry
 cranberry	european_cranberry
+###

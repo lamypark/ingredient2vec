@@ -28,12 +28,8 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
-<<<<<<< HEAD
-		model = gensim.models.doc2vec.Doc2Vec(size=10, alpha=0.025, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, iter=100)
-=======
 		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=4, iter=100, 
 												dbow_words=1, dm_mean=0)
->>>>>>> c14c8b3c29015e9f529348642ebc24ce93f4218c
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
 		print "Document Embedding Dimension:", Config.DOC_DIM

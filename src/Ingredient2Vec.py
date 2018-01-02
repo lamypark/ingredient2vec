@@ -61,6 +61,20 @@ class Ingredient2Vec:
 		print 'Number of ingredients : %d' % (len(compound_length_list))
 		print 'Average Length of Compounds: %f' % (reduce(lambda x, y: x + y, compound_length_list) / float(len(compound_length_list)))
 
+	def build_taggedDocument_recipe(self, recipe, filtering=5, random_sampling=False, num_sampling=0):
+		
+		compound_length_list = []
+		
+		print '\n\n...Building Training Set'
+
+		sentences = []
+		with open(recipe, 'r') as f:
+			for line in f:
+				sentence = line.rstrip().split(",")[1:]
+				sentences.append(sentence)
+
+		return sentences
+
 if __name__ == '__main__':
 	dataLoader = DataLoader.DataLoader()
 	gensimLoader = GensimModels.GensimModels()
@@ -72,13 +86,18 @@ if __name__ == '__main__':
 	compounds = dataLoader.load_compounds(Config.path_comp_info)
 	relations = dataLoader.load_relations(Config.path_ingr_comp)
 
+
+
 	"""
 	Preproccesing
 
 	"""
 
 	# build taggedDocument form of corpus
-	corpus_ingredient_compounds = list(ingr2vec.build_taggedDocument(ingredients, compounds, relations, filtering=Config.FILTERING, random_sampling=Config.RANDOM_SAMPLING, num_sampling=Config.NUM_SAMPLING))
+	#corpus_ingredient_compounds = list(ingr2vec.build_taggedDocument(ingredients, compounds, relations, filtering=Config.FILTERING, random_sampling=Config.RANDOM_SAMPLING, num_sampling=Config.NUM_SAMPLING))
+
+	corpus_culture_ingredients = ingr2vec.build_taggedDocument_recipe(Config.path_culture, filtering=Config.FILTERING, random_sampling=Config.RANDOM_SAMPLING, num_sampling=Config.NUM_SAMPLING)
+
 
 	"""
 	Build & Save Doc2Vec 
@@ -86,18 +105,18 @@ if __name__ == '__main__':
 	"""
 
 	# build ingredient embeddings with doc2vec
-<<<<<<< HEAD
-	model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.PRE_TRAIN, path_pretrained=Config.path_embeddings_compounds)
-=======
-	model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds)
->>>>>>> c14c8b3c29015e9f529348642ebc24ce93f4218c
+	#model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingredient_compounds, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds)
+
+	model = gensim.models.Word2Vec(corpus_culture_ingredients, min_count=5)
+	model.wv.save_word2vec_format(Config.path_embeddings_ingredients_recipe, binary=True)
+
 
 	# save character-level compounds embeddings with doc2vec
-	gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
-	model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients)
+	#gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_ingredients)
+	model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_recipe)
 
 
-	X = []
+	#X = []
 	for x in model_loaded.vocab:
 		print x, model_loaded.word_vec(x)
 
@@ -105,8 +124,8 @@ if __name__ == '__main__':
 	Plot Ingredient2Vec
 
 	"""
-	model_tsne = DataPlotter.load_TSNE(model_loaded, dim=2)
-	DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category, withLegends=True)
+	#model_tsne = DataPlotter.load_TSNE(model_loaded, dim=2)
+	#DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category, withLegends=True)
 	#DataPlotter.plot_clustering(model_loaded, model_tsne, Config.path_plottings_ingredients_clustering)
 
 

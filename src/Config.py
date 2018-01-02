@@ -5,7 +5,7 @@ DATE = 1712141252
 DATE = 1712141347
 
 # Building Training Set Paramter
-FILTERING = 5					# Ingredient-Compounds Pair / Threshold for Least Compounds
+FILTERING = 4					# Ingredient-Compounds Pair / Threshold for Least Compounds
 RANDOM_SAMPLING = True			# Whether to Random Sample or not
 NUM_SAMPLING = 50				# Number of Random Sampling
 
@@ -31,6 +31,8 @@ file_name = '_f-' + str(FILTERING) + '_rs-' + str(RANDOM_SAMPLING) + '_ns-' + st
 # Embeddings
 path_embeddings_compounds = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_compounds_50.bin'
 path_embeddings_ingredients = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients' + file_name
+path_embeddings_ingredients_recipe = path_results + os.sep + 'embeddings' + os.sep + 'embeddings_ingredients_recipe' + file_name
+
 
 # Plottings
 path_plottings_ingredients_category = path_results + os.sep + 'plot_ingredient_embeddings_category' + file_name

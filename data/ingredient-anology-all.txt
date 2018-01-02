@@ -382,5 +382,4 @@ pennyroyal	american_pennyroyal
 peppermint_oil	american_peppermint_oil
 potato_chip	american_potato_chip
 cranberry	american_cranberry
-cranberry	european_cranberry
 ###

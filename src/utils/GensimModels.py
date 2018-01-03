@@ -6,9 +6,37 @@ import multiprocessing
 import Config
 
 class GensimModels():
-	
+
 	"""
-	Train Doc2Vec Model
+	Train Word2Vec Model with Gensim
+	"""
+
+	def build_word2vec(self, corpus, load_pretrained=False, path_pretrained=""):
+		print "\n\n...Start to build Word2Vec Models with Gensim"
+
+		time_start = time.time()
+		cores = multiprocessing.cpu_count()
+
+		model = gensim.models.Word2Vec(corpus, size=Config.WOR_DIM, window=Config.FILTERING, min_count=Config.FILTERING, workers=cores)
+
+		print "Word Embedding Dimension:", Config.WOR_DIM
+		print "Word Window & Filtering:", Config.FILTERING
+
+		print "Unique Words Count:", len(model.wv.vocab)
+
+		return model
+		
+	def save_word2vec(self, model, path):
+		print "\n\n...Save Word2Vec with a file name of", path
+		model.wv.save_word2vec_format(path, binary=True)
+
+	def load_word2vec(self, path):
+		print "\n\n...Load Word2Vec with a file name of", path
+		model = KeyedVectors.load_word2vec_format(path, binary=True)
+		return model
+
+	"""
+	Train Doc2Vec Model with Gensim
 
 	"""
 	def build_doc2vec(self, corpus, load_pretrained=False, path_pretrained=""):
@@ -28,7 +56,7 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
-		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=4, iter=100, 
+		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=cores, iter=100, 
 												dbow_words=1, dm_mean=0)
 		model.build_vocab(corpus, keep_raw_vocab=False)
 
@@ -48,10 +76,6 @@ class GensimModels():
 		print "Doc2Vec training done!"
 		print "Time elapsed: {} seconds".format(time.time()-time_start)
 
-		return model
-
-	def load_word2vec(self, path):
-		model = KeyedVectors.load_word2vec_format(path, binary=True)
 		return model
 
 	def save_doc2vec(self, model, path):

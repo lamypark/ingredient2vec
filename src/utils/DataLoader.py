@@ -22,13 +22,13 @@ class DataLoader:
                 else:
                     line_split = line.rstrip().split('\t')
                     ingredient_id = line_split[0]
-                    ingredient_id = line_split[1]
+                    compound_id = line_split[1]
 
                     if ingredient_id in relations:
-                        relations[ingredient_id].append(ingredient_id)
+                        relations[ingredient_id].append(compound_id)
 
                     else:
-                        relations[ingredient_id] = [ingredient_id]
+                        relations[ingredient_id] = [compound_id]
 
         return relations
 
@@ -47,7 +47,7 @@ class DataLoader:
                     ingredients[ingredients_id] = ingredients_list
         return ingredients
 
-	# {compound_id: [compound_name, CAS_number]}
+    # {compound_id: [compound_name, CAS_number]}
     def load_compounds(self, path):
         compounds = {}
         compounds_list = []
@@ -63,13 +63,13 @@ class DataLoader:
         return compounds
 
     def batch_iter(self, data, batch_size):
-		#data = np.array(data)
-		data_size = len(data)
-		num_batches = int(len(data)/batch_size)
-		for batch_num in range(num_batches):
-			start_index = batch_num * batch_size
-			end_index = min((batch_num + 1) * batch_size, data_size)
-			yield data[start_index:end_index]
+        #data = np.array(data)
+        data_size = len(data)
+        num_batches = int(len(data)/batch_size)
+        for batch_num in range(num_batches):
+            start_index = batch_num * batch_size
+            end_index = min((batch_num + 1) * batch_size, data_size)
+            yield data[start_index:end_index]
 
     def load_data(self, train, feat_dim):
         from nltk.stem import WordNetLemmatizer
@@ -159,56 +159,55 @@ class DataLoader:
 
         return id2cult, id2comp, train_cult[:train_thr], train_comp[:train_thr], train_comp_len[:train_thr], train_cult[train_thr:valid_thr], train_comp[train_thr:valid_thr], train_comp_len[train_thr:valid_thr], train_cult[valid_thr:], train_comp[valid_thr:], train_comp_len[valid_thr:], max_comp_cnt, compid2vec
 
-	# Ingredient_to_category
-	def ingredient_to_category(self, tag, ingredients):
-		for ingr_id in ingredients:
-			if ingredients[ingr_id][0] == tag:
-				return ingredients[ingr_id][1]
-			else: 
-				continue
-		return
+    # Ingredient_to_category
+    def ingredient_to_category(self, tag, ingredients):
+        for ingr_id in ingredients:
+            if ingredients[ingr_id][0] == tag:
+                return ingredients[ingr_id][1]
+            else: 
+                continue
+        return
 
 
-	# Corpus tag to index
-	def tag_to_index(tags, corpus):
-		for doc_id in range(len(corpus)):
-			if tags == corpus[doc_id].tags[0]:
-				return doc_id
-			else:
-				continue
-		return
-		 
+    # Corpus tag to index
+    def tag_to_index(tags, corpus):
+        for doc_id in range(len(corpus)):
+            if tags == corpus[doc_id].tags[0]:
+                return doc_id
+            else:
+                continue
+        return
 
-	# Corpus index to tag					
-	def index_to_tag(index, corpus):
-		return corpus[index].tags
+    # Corpus index to tag                    
+    def index_to_tag(index, corpus):
+        return corpus[index].tags
 
 
-	# Cuisine - Ingredients
-	def load_cultures(self, path):
-		cultures = {}
-		ingredient_list = []
-		vocab = []
+    # Cuisine - Ingredients
+    def load_cultures(self, path):
+        cultures = {}
+        ingredient_list = []
+        vocab = []
 
-		with open(path, 'r') as f:
-			culture_id = 0
-			for culture_id, line in enumerate(f):
-				if line[0] == '#':
-					pass
-				else:
-					line_split = line.rstrip().split(',')
-					culture_label = line_split[0]
-					ingredient_list = line_split[1:]
-					cultures[culture_id] = [ingredient_list, [culture_label]]
-					for ingr in ingredient_list:
-						vocab.append(ingr)
+        with open(path, 'r') as f:
+            culture_id = 0
+            for culture_id, line in enumerate(f):
+                if line[0] == '#':
+                    pass
+                else:
+                    line_split = line.rstrip().split(',')
+                    culture_label = line_split[0]
+                    ingredient_list = line_split[1:]
+                    cultures[culture_id] = [ingredient_list, [culture_label]]
+                    for ingr in ingredient_list:
+                        vocab.append(ingr)
 
-		return cultures, set(vocab)
+        return cultures, set(vocab)
 
 if __name__ == '__main__':
-	dl = DataLoader()
-	#ingredients = dl.load_ingredients(Config.path_ingr_info)
-	#compounds = dl.load_compounds(Config.path_comp_info)
-	#relations = dl.load_relations(Config.path_ingr_comp)
+    dl = DataLoader()
+    #ingredients = dl.load_ingredients(Config.path_ingr_info)
+    #compounds = dl.load_compounds(Config.path_comp_info)
+    #relations = dl.load_relations(Config.path_ingr_comp)
 
-	cuisines = dl.load_cuisine(Config.path_cuisine)
+    cuisines = dl.load_cuisine(Config.path_cuisine)

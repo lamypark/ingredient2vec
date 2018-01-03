@@ -46,12 +46,14 @@ class RNNModule(nn.Module):
         # modules:
         self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim, padding_idx=0).type(ftype)
         self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
-        self.gru = nn.GRU(feat_dim, cult_cnt, num_layers=3, batch_first=True, dropout=0.5, bidirectional=True)
+        self.gru = nn.GRU(feat_dim, cult_cnt, num_layers=2, batch_first=True, dropout=0.5, bidirectional=True)
         self.active = nn.Sigmoid()
 
     def forward(self, x, emb_mask, x_len, step):
         x = self.ingr_weight(x)
         x = torch.mul(x, emb_mask)
+        print x_len
+        x_len, x_idx = torch.sort(x_len, descending=True)
         x, _ = self.gru(x)
         x = [x[i,x_len[i]-1,:].view(1,-1) for i in xrange(x.size()[0])]
         x = self.active(torch.cat(x, 0))

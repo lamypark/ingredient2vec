@@ -37,7 +37,7 @@ evaluate_every = 3
 # Load data
 print("Loading data...")
 dl = DataLoader.DataLoader()
-id2cult, id2ingr, train_cult, train_ingr, train_ingr_len, test_cult, test_ingr, test_ingr_len, max_ingr_cnt, ingrid2vec = dl.load_data(train_file, feat_dim)
+id2cult, id2ingr, train_cult, train_ingr, train_ingr_len, valid_cult, valid_ingr, valid_ingr_len, test_cult, test_ingr, test_ingr_len, max_ingr_cnt, ingrid2vec = dl.load_data(train_file, feat_dim)
 
 print("Train/Test/Cult/ingr: {:d}/{:d}/{:d}/{:d}".format(len(train_cult), len(test_cult), len(id2cult), len(id2ingr)))
 print("==================================================================================")
@@ -55,7 +55,7 @@ class ConvModule(nn.Module):
 
         # modules:
         self.ingr_weight = nn.Embedding(ingr_cnt, feat_dim).type(ftype)
-        self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
+        #self.ingr_weight.weight.data.copy_(torch.from_numpy(np.asarray(ingrid2vec)))
         self.cnn1 = nn.Conv1d(self.in_channels, 32, self.cnn_kernel_size)
         self.cnn2 = nn.Conv1d(32, self.out_channels, self.cnn_kernel_size)
         '''
@@ -194,7 +194,7 @@ for i in xrange(num_epochs):
     if (i+1) % evaluate_every == 0:
         print("==================================================================================")
         print("Evaluation at epoch #{:d}: ".format(i+1))
-        test_batches = dl.batch_iter(list(zip(test_cult, test_ingr, test_ingr_len)), batch_size)
+        test_batches = dl.batch_iter(list(zip(valid_cult, valid_ingr, valid_ingr_len)), batch_size)
         print_score(test_batches, step=2)
 
 # Testing

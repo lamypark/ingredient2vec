@@ -5,7 +5,7 @@ DATE = 1712141252
 DATE = 1712141347
 
 # Building Training Set Paramter
-FILTERING = 4					# Ingredient-Compounds Pair / Threshold for Least Compounds
+FILTERING = 5					# Ingredient-Compounds Pair / Threshold for Least Compounds
 RANDOM_SAMPLING = True			# Whether to Random Sample or not
 NUM_SAMPLING = 50				# Number of Random Sampling
 

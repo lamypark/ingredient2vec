@@ -93,7 +93,8 @@ class DataLoader:
         train_f = open(train, 'r')
         lines = train_f.readlines()[4:]
         random.shuffle(lines)
-        train_thr = int(len(lines) * 0.8)
+        train_thr = int(len(lines) * 0.7)
+        valid_thr = int(len(lines) * 0.8)
 
         print "Build composer dictionary..."
         for i, line in enumerate(lines):
@@ -156,7 +157,7 @@ class DataLoader:
         print "unk cnt :", unk_cnt, "in", len(id2comp)
         print "filtered composer count is", filtred_comp
 
-        return id2cult, id2comp, train_cult[:train_thr], train_comp[:train_thr], train_comp_len[:train_thr], train_cult[train_thr:], train_comp[train_thr:], train_comp_len[train_thr:], max_comp_cnt, compid2vec
+        return id2cult, id2comp, train_cult[:train_thr], train_comp[:train_thr], train_comp_len[:train_thr], train_cult[train_thr:valid_thr], train_comp[train_thr:valid_thr], train_comp_len[train_thr:valid_thr], train_cult[valid_thr:], train_comp[valid_thr:], train_comp_len[valid_thr:], max_comp_cnt, compid2vec
 
 	# Ingredient_to_category
 	def ingredient_to_category(self, tag, ingredients):

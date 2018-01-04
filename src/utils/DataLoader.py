@@ -62,6 +62,21 @@ class DataLoader:
                     compounds[compounds_id] = compounds_list
         return compounds
 
+    # {compound_id: [compound_name, CAS_number, inChiKey, Smiles]}
+    def load_compounds_updated(self, path):
+        compounds = {}
+        compounds_list = []
+        with open(path, 'r') as f:
+            for line in f:
+                if line[0] == '#':
+                    pass
+                else:
+                    line_split = line.rstrip().split('\t')
+                    compounds_id = line_split[0]
+                    compounds_list = line_split[1:]
+                    compounds[compounds_id] = compounds_list
+        return compounds
+
     def batch_iter(self, data, batch_size):
         #data = np.array(data)
         data_size = len(data)

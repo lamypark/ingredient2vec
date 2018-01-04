@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	# mode 999 : Plot Loaded Word2Vec or Doc2vec
 	"""
 
-	mode = 999
+	mode = 1
 
 	if mode == 1:
 		"""
@@ -107,12 +107,12 @@ if __name__ == '__main__':
 
 		"""
 		# build ingredient embeddings with doc2vec
-		model_ingr2vec_cc = gensimLoader.build_doc2vec(corpus_ingr2vec_cc, load_pretrained=Config.CHAR_EMB, path_pretrained="")
+		model_ingr2vec_cc = gensimLoader.build_doc2vec(corpus_ingr2vec_cc, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds_inchi)
 
 		# save character-level compounds embeddings with doc2vec
-		gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec_cc, path=Config.path_embeddings_ingredients_cc)
+		gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec_cc, path=Config.path_embeddings_ingredients_cc_inchi)
 
-		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc)
+		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc_inchi)
 
 		#for x in model_loaded.vocab:
 		#	print x, model_loaded.word_vec(x)
@@ -144,9 +144,9 @@ if __name__ == '__main__':
 		Plot Ingredient2Vec
 
 		"""
-		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc)
+		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc_inchi)
 		model_tsne = DataPlotter.load_TSNE(model_loaded, dim=2)
-		DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category, withLegends=True)
+		DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category_cc_inchi, withLegends=True)
 		#DataPlotter.plot_clustering(model_loaded, model_tsne, Config.path_plottings_ingredients_clustering)
 
 	else:

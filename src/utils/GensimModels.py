@@ -56,6 +56,7 @@ class GensimModels():
 		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
 		batch_words=10000, compute_loss=False)
 		"""
+		# By default (dm=1), 'distributed memory' (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW) 
 		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=cores, iter=100, 
 												dbow_words=1, dm_mean=0)
 		model.build_vocab(corpus)

@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	# mode 999 : Plot Loaded Word2Vec or Doc2vec
 	"""
 
-	mode = 1
+	mode = 2
 
 	if mode == 1:
 		"""

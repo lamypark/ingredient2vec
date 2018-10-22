@@ -1,6 +1,8 @@
 # import libraries
 import gensim
 import random
+import pandas as pd
+import numpy as np
 from itertools import combinations
 
 # import implemented python files
@@ -15,9 +17,9 @@ class Ingredient2Vec:
 		return math.factorial(n) / (math.factorial(k) * math.factorial(n-k))
 
 	def build_taggedDocument_cc(self, ingredients, compounds, relations, filtering=5, random_sampling=False, num_sampling=0):
-		
+
 		compound_length_list = []
-		
+
 		print '\n\n...Building Training Set'
 
 		# relations
@@ -39,7 +41,7 @@ class Ingredient2Vec:
 				# Random Sampling
 				if random_sampling:
 					#print ingredient_name, len(compound_list), len(compound_list)/num_sampling*3
-					
+
 					#all the combinations
 					#sample_list = ["".join(x) for x in combinations(compound_list, 5)]
 					#print len(sample_list)
@@ -48,15 +50,15 @@ class Ingredient2Vec:
 					for i in xrange(num_sampling):
 						sampled_compounds = random.sample(compound_list, filtering)
 						yield gensim.models.doc2vec.TaggedDocument(compound_list, [ingredient_name])
-						
+
 
 				# Just Sampling
 				else:
 					yield gensim.models.doc2vec.TaggedDocument(compound_list, [ingredient_name])
 
-				
-		print 'Sampling %d' % (num_sampling) 
-		print 'Filter %d' % (filtering) 
+
+		print 'Sampling %d' % (num_sampling)
+		print 'Filter %d' % (filtering)
 		print 'Number of ingredients : %d' % (len(compound_length_list))
 		print 'Average Length of Compounds: %f' % (reduce(lambda x, y: x + y, compound_length_list) / float(len(compound_length_list)))
 
@@ -71,6 +73,32 @@ class Ingredient2Vec:
 
 		return sentences
 
+	def build_taggedDocument_df(self, df, filtering=5, random_sampling=False, num_sampling=0):
+
+		print '\n\n...Building Training Set'
+		for index, row in df.iterrows():
+			compound_list = row['text'].split("  ")
+			#print compound_list
+			ingredient_name = row['label'].decode("utf8").strip()
+
+			# Random Sampling
+			if random_sampling:
+				#print ingredient_name, len(compound_list), len(compound_list)/num_sampling*3
+
+				#all the combinations
+				#sample_list = ["".join(x) for x in combinations(compound_list, 5)]
+				#print len(sample_list)
+
+				#sample randomly
+				for i in xrange(num_sampling):
+					sampled_compounds = random.sample(compound_list, filtering)
+					yield gensim.models.doc2vec.TaggedDocument(compound_list, [ingredient_name])
+
+			# Just Sampling
+			else:
+				yield gensim.models.doc2vec.TaggedDocument(compound_list, [ingredient_name])
+
+
 if __name__ == '__main__':
 	dataLoader = DataLoader.DataLoader()
 	gensimLoader = GensimModels.GensimModels()
@@ -80,11 +108,11 @@ if __name__ == '__main__':
 	Mode Description
 
 	# mode 1 : Embed Ingredients with Chemical Compounds
-	# mode 2 : Embed Ingredinets with other Ingredient Context
+	# mode 3 : Embed Ingredinets with other Ingredient Context
 	# mode 999 : Plot Loaded Word2Vec or Doc2vec
 	"""
 
-	mode = 2
+	mode = 999
 
 	if mode == 1:
 		"""
@@ -107,17 +135,48 @@ if __name__ == '__main__':
 
 		"""
 		# build ingredient embeddings with doc2vec
-		model_ingr2vec_cc = gensimLoader.build_doc2vec(corpus_ingr2vec_cc, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds_inchi)
+		#model_ingr2vec_cc = gensimLoader.build_doc2vec(corpus_ingr2vec_cc, load_pretrained=Config.CHAR_EMB, path_pretrained=Config.path_embeddings_compounds_inchi)
+		model_ingr2vec_cc = gensimLoader.build_doc2vec(corpus_ingr2vec_cc, load_pretrained=False, path_pretrained=False)
+
 
 		# save character-level compounds embeddings with doc2vec
-		gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec_cc, path=Config.path_embeddings_ingredients_cc_inchi)
+		gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec_cc, path=Config.path_embeddings_compounds_rnd)
 
-		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc_inchi)
+		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_compounds_rnd)
 
 		#for x in model_loaded.vocab:
 		#	print x, model_loaded.word_vec(x)
 
-	elif mode == 2:
+	if mode == 2:
+		"""
+		Load Data
+		"""
+		#ingredient_sentence = "../data/scientific_report/D7_flavornet-vocab-compounds.csv"
+		ingredient_sentence = "../data/scientific_report/flavordb_ver2.0.csv"
+		df = pd.read_csv(ingredient_sentence)
+		"""
+		Preprocess Data
+
+		"""
+		# build taggedDocument form of corpus
+		corpus_ingr2vec = list(ingr2vec.build_taggedDocument_df(df, filtering=Config.FILTERING, random_sampling=Config.RANDOM_SAMPLING, num_sampling=Config.NUM_SAMPLING))
+
+		"""
+		Build & Save Doc2Vec
+
+		"""
+		# build ingredient embeddings with doc2vec
+		model_ingr2vec = gensimLoader.build_doc2vec(corpus_ingr2vec, load_pretrained=False, path_pretrained=False)
+
+		# save character-level compounds embeddings with doc2vec
+		gensimLoader.save_doc2vec_only_doc(model=model_ingr2vec, path=Config.path_embeddings_compounds_rnd)
+
+		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_compounds_rnd)
+
+		#for x in model_loaded.vocab:
+		#	print x, model_loaded.word_vec(x)
+
+	elif mode == 3:
 		"""
 		Load Data & Preprocess Data
 		"""
@@ -126,10 +185,10 @@ if __name__ == '__main__':
 		"""
 		Build & Save Doc2Vec
 
-		"""	
+		"""
 		# build ingredient embeddings with word2vec
 		model_ingr2vec_ic = gensimLoader.build_word2vec(corpus_ingr2vec_ic, load_pretrained=False, path_pretrained="")
-		
+
 		# save embeddings
 		gensimLoader.save_word2vec(model=model_ingr2vec_ic, path=Config.path_embeddings_ingredients_ic)
 
@@ -144,15 +203,10 @@ if __name__ == '__main__':
 		Plot Ingredient2Vec
 
 		"""
-		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_ingredients_cc_inchi)
+		model_loaded = gensimLoader.load_word2vec(path=Config.path_embeddings_compounds_rnd)
 		model_tsne = DataPlotter.load_TSNE(model_loaded, dim=2)
-		DataPlotter.plot_category(model_loaded, model_tsne, Config.path_plottings_ingredients_category_cc_inchi, withLegends=True)
+		DataPlotter.plot_category(model_loaded, model_tsne, Config.path_embeddings_compounds_rnd, withLegends=False)
 		#DataPlotter.plot_clustering(model_loaded, model_tsne, Config.path_plottings_ingredients_clustering)
 
 	else:
 		print "Please specify the mode you want."
-
-
-
-
-

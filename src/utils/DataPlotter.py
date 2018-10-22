@@ -56,11 +56,11 @@ def plot_clustering(model, model_tsne, path):
 	]
 
 	make_plot_with_labels_legends(name=path,
-          points=model_tsne, 
-          labels=labels, 
-          legend_labels=clusters, 
-          legend_order=cluster_order, 
-          legend_label_to_color=cluster2color, 
+          points=model_tsne,
+          labels=labels,
+          legend_labels=clusters,
+          legend_order=cluster_order,
+          legend_label_to_color=cluster2color,
           pretty_legend_label=pretty_category,
           publish=False)
 
@@ -81,7 +81,7 @@ def plot_category(model, model_tsne, path, withLegends=False):
 		categories = []
 		for label in labels:
 			categories.append(dl.ingredient_to_category(label,ingredients))
-		
+
 		categories_color = list(set(categories))
 
 
@@ -120,18 +120,18 @@ def plot_category(model, model_tsne, path, withLegends=False):
 		]
 
 		make_plot_with_labels_legends(name=path,
-          points=model_tsne, 
-          labels=labels, 
-          legend_labels=categories, 
-          legend_order=category_order, 
-          legend_label_to_color=category2color, 
+          points=model_tsne,
+          labels=labels,
+          legend_labels=categories,
+          legend_order=category_order,
+          legend_label_to_color=category2color,
           pretty_legend_label=pretty_category,
           publish=False)
 
 	else:
 		make_plot_only_labels(name=path,
-				  points=model_tsne, 
-				  labels=labels, 
+				  points=model_tsne,
+				  labels=labels,
 				  publish=False)
 
 """
@@ -152,7 +152,7 @@ def load_TSNE(model, dim=2):
 	print "Time elapsed: {} seconds".format(time.time()-time_start)
 
 	return X_tsne
-	
+
 
 """
 Load functions for plotting a graph
@@ -184,14 +184,14 @@ def make_plot_only_labels(name, points, labels, publish):
 			hoverinfo = 'text',
 		)
 		)
-				  
+
 	layout = go.Layout(
 		xaxis=dict(
 			autorange=True,
 			showgrid=False,
 			zeroline=False,
 			showline=False,
-			autotick=True,
+			#autotick=True,
 			ticks='',
 			showticklabels=False
 		),
@@ -200,12 +200,12 @@ def make_plot_only_labels(name, points, labels, publish):
 			showgrid=False,
 			zeroline=False,
 			showline=False,
-			autotick=True,
+			#autotick=True,
 			ticks='',
 			showticklabels=False
 		)
 		)
-				  
+
 	fig = go.Figure(data=traces, layout=layout)
 	if publish:
 		plotter = py.iplot
@@ -251,7 +251,7 @@ def make_plot_with_labels_legends(name, points, labels, legend_labels, legend_or
 		trace.name = pretty_legend_label(trace.name)
 		return trace
 	traces_ordered = list(map(_set_name, traces_ordered))
-	
+
 	"""
 	annotations = []
 	for index in range(50):
@@ -268,14 +268,14 @@ def make_plot_with_labels_legends(name, points, labels, legend_labels, legend_or
 			)
 		annotations.append(new_dict)
 	"""
-	
+
 	layout = go.Layout(
 		xaxis=dict(
 			autorange=True,
 			showgrid=False,
 			zeroline=True,
 			showline=True,
-			autotick=True,
+			#autotick=True,
 			ticks='',
 			showticklabels=False
 		),
@@ -284,7 +284,7 @@ def make_plot_with_labels_legends(name, points, labels, legend_labels, legend_or
 			showgrid=False,
 			zeroline=True,
 			showline=True,
-			autotick=True,
+			#autotick=True,
 			ticks='',
 			showticklabels=False
 		),

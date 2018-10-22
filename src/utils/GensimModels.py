@@ -25,7 +25,7 @@ class GensimModels():
 		print "Unique Words Count:", len(model.wv.vocab)
 
 		return model
-		
+
 	def save_word2vec(self, model, path):
 		print "\n\n...Save Word2Vec with a file name of", path
 		model.wv.save_word2vec_format(path, binary=True)
@@ -51,14 +51,14 @@ class GensimModels():
 		# PV-DM w/ average
 		"""
 		class gensim.models.word2vec.Word2Vec
-		(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, 
-		sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1, 
-		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
+		(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None,
+		sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1,
+		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1,
 		batch_words=10000, compute_loss=False)
 		"""
-		# By default (dm=1), 'distributed memory' (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW) 
-		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=cores, iter=100, 
-												dbow_words=1, dm_mean=0)
+		# By default (dm=1), 'distributed memory' (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW)
+		model = gensim.models.doc2vec.Doc2Vec(vector_size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=cores, epochs=100,
+												dbow_words=1, dm_mean=0, dm=0)
 		model.build_vocab(corpus)
 
 		#print len(model.wv.vocab)
@@ -70,10 +70,7 @@ class GensimModels():
 			model.intersect_word2vec_format(path_pretrained, lockf=0.0, binary=True, encoding='utf8', unicode_errors='strict')
 
 		#print len(model)
-
 		#print model.vocab
-
-
 
 		print "Document Embedding Dimension:", Config.DOC_DIM
 		print "Document Window & Filtering:", Config.FILTERING
@@ -81,7 +78,6 @@ class GensimModels():
 
 		print "Unique Words Count:", len(model.wv.vocab)
 		print "Total Documents Count:", model.corpus_count
-
 
 
 		print "\n\n...Training Started"
@@ -104,12 +100,12 @@ class GensimModels():
 		# PV-DM w/ average
 		"""
 		class gensim.models.word2vec.Word2Vec
-		(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, 
-		sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1, 
-		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, 
+		(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None,
+		sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1,
+		hashfxn=<built-in function hash>, iter=5, null_word=0, trim_rule=None, sorted_vocab=1,
 		batch_words=10000, compute_loss=False)
 		"""
-		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5,  alpha=0.025, min_alpha=0.001, workers=cores, iter=100, 
+		model = gensim.models.doc2vec.Doc2Vec(size=Config.DOC_DIM, window=Config.FILTERING, min_count=Config.FILTERING, negative=5, alpha=0.025, min_alpha=0.001, workers=cores, iter=100,
 												dbow_words=1, dm_mean=0)
 		model.build_vocab(corpus, keep_raw_vocab=True)
 

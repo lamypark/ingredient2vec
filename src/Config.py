@@ -1,17 +1,17 @@
 import os
 
-DATE = 1801041938
+DATE = 1810221645
 
 # Building Training Set Paramter
 FILTERING = 5					# Ingredient-Compounds Pair / Threshold for Least Compounds
-RANDOM_SAMPLING = False			# Whether to Random Sample or not
-NUM_SAMPLING = 50				# Number of Random Sampling
+RANDOM_SAMPLING = True			# Whether to Random Sample or not
+NUM_SAMPLING = 10				# Number of Random Sampling
 
 # Word2Vec Model Parameter
 WOR_DIM = 50
 
 # Doc2Vec Model Parameter
-CHAR_EMB = True				# Use pre-trained character-level embeddings
+CHAR_EMB = False				# Use pre-trained character-level embeddings
 DOC_DIM = 10
 
 """
@@ -30,7 +30,7 @@ Paths for Chemical Compounds Embedding
 """
 
 # File Name Protocol
-file_name_compounds_embeddings = '_f-' + str(FILTERING) + '_rs-' + str(RANDOM_SAMPLING) + '_ns-' + str(NUM_SAMPLING) + '_ifcharemb-' + str(CHAR_EMB) + '_dim-' + str(DOC_DIM) + '_' + '1801031522' 
+file_name_compounds_embeddings = '_f-' + str(FILTERING) + '_rs-' + str(RANDOM_SAMPLING) + '_ns-' + str(NUM_SAMPLING) + '_ifcharemb-' + str(CHAR_EMB) + '_dim-' + str(DOC_DIM) + '_' + str(DATE)
 
 path_comp_info = path_data + os.sep + 'scientific_report' + os.sep + 'comp_info.tsv'
 
@@ -57,7 +57,7 @@ Paths for Ingredients Embedding
 """
 
 # File Name Protocol
-file_name_ingredient_embeddings = '_f-' + str(FILTERING) + '_rs-' + str(RANDOM_SAMPLING) + '_ns-' + str(NUM_SAMPLING) + '_ifcharemb-' + str(CHAR_EMB) + '_dim-' + str(DOC_DIM) + '_' + str(DATE) 
+file_name_ingredient_embeddings = '_f-' + str(FILTERING) + '_rs-' + str(RANDOM_SAMPLING) + '_ns-' + str(NUM_SAMPLING) + '_ifcharemb-' + str(CHAR_EMB) + '_dim-' + str(DOC_DIM) + '_' + str(DATE)
 
 # Data Path
 path_ingr_info = path_data + os.sep + 'scientific_report' + os.sep + 'ingr_info.tsv'
